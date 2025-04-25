@@ -1,11 +1,16 @@
 package io.github.jonasvlima.libraryapi.repository;
 
 import io.github.jonasvlima.libraryapi.model.Autor;
+import io.github.jonasvlima.libraryapi.model.GeneroLivro;
+import io.github.jonasvlima.libraryapi.model.Livro;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +20,9 @@ public class AutorRepositoryTest {
 
     @Autowired
     AutorRepository repository;
+
+    @Autowired
+    LivroRepository livroRepository;
 
     @Test
     public void salvarTest(){
@@ -68,5 +76,49 @@ public class AutorRepositoryTest {
         var id = UUID.fromString("5df21f9d-32cb-476f-b43e-5d1551f294c7");
         var maria = repository.findById(id).get();
         repository.delete(maria);
+    }
+
+    @Test
+    void salvarAutorComLivrosTest(){
+        Autor autor = new Autor();
+        autor.setNome("Kang Haerin");
+        autor.setNacionalidade("Coreano");
+        autor.setDataNascimento(LocalDate.of(2006, 5, 15));
+
+        Livro livro = new Livro();
+        livro.setIsbn("25387-84874");
+        livro.setPreco(BigDecimal.valueOf(300));
+        livro.setGenero(GeneroLivro.ROMANCE);
+        livro.setTitulo("Pequena Batatinha");
+        livro.setDataPublicacao(LocalDate.of(2024, 3, 23));
+        livro.setAutor(autor);
+
+        Livro livro2 = new Livro();
+        livro2.setIsbn("50238-94874");
+        livro2.setPreco(BigDecimal.valueOf(300));
+        livro2.setGenero(GeneroLivro.ROMANCE);
+        livro2.setTitulo("Estrelas Brilham");
+        livro2.setDataPublicacao(LocalDate.of(2025, 3, 2));
+        livro2.setAutor(autor);
+
+        autor.setLivros(new ArrayList<>());
+        autor.getLivros().add(livro);
+        autor.getLivros().add(livro2);
+
+        repository.save(autor);
+
+//        livroRepository.saveAll(autor.getLivros());
+
+    }
+
+    @Test
+    void listarLivrosAutor(){
+        var id = UUID.fromString("5d611e54-1689-4b47-b214-094213ea23f5");
+        var autor = repository.findById(id).get();
+
+        List<Livro> livrosLista = livroRepository.findByAutor(autor);
+        autor.setLivros(livrosLista);
+
+        autor.getLivros().forEach(System.out::println);
     }
 }
