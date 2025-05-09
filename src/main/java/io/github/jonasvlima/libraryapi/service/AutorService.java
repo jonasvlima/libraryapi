@@ -2,9 +2,7 @@ package io.github.jonasvlima.libraryapi.service;
 
 import io.github.jonasvlima.libraryapi.model.Autor;
 import io.github.jonasvlima.libraryapi.repository.AutorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,5 +22,9 @@ public class AutorService {
 
     public Optional<Autor> obterPorId(UUID id){
         return autorRepository.findById(id);
+    }
+
+    public void deletar(Autor autor) {
+        autorRepository.delete(autor);
     }
 }
