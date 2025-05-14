@@ -1,7 +1,10 @@
 package io.github.jonasvlima.libraryapi.service;
 
+import io.github.jonasvlima.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.jonasvlima.libraryapi.model.Autor;
 import io.github.jonasvlima.libraryapi.repository.AutorRepository;
+import io.github.jonasvlima.libraryapi.repository.LivroRepository;
+import io.github.jonasvlima.libraryapi.validator.AutorValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,20 +15,27 @@ import java.util.UUID;
 public class AutorService {
 
     private final AutorRepository autorRepository;
+    private final AutorValidator autorValidator;
+    private final LivroRepository livroRepository;
 
-    public AutorService(AutorRepository autorRepository){
-
+    public AutorService(AutorRepository autorRepository,
+                        AutorValidator autorValidator,
+                        LivroRepository livroRepository){
         this.autorRepository = autorRepository;
+        this.autorValidator = autorValidator;
+        this.livroRepository = livroRepository;
     }
 
     public Autor salvar(Autor autor){
+        autorValidator.validar(autor);
         return autorRepository.save(autor);
     }
 
     public void atualizar(Autor autor){
-        if (autor.getId().equals(null)){
+        if (autor.getId() == null){
             throw new IllegalArgumentException("Para atualizar é necessário que o autor já esteja salvo na base");
         }
+        autorValidator.validar(autor);
         autorRepository.save(autor);
     }
 
@@ -34,6 +44,9 @@ public class AutorService {
     }
 
     public void deletar(Autor autor) {
+        if (possuiLivro(autor)){
+            throw new OperacaoNaoPermitidaException("Não é permitido excluir um Autor que possui livros cadastrados!");
+        }
         autorRepository.delete(autor);
     }
 
@@ -51,5 +64,9 @@ public class AutorService {
         }
 
         return autorRepository.findAll();
+    }
+
+    public boolean possuiLivro(Autor autor) {
+        return livroRepository.existsByAutor(autor);
     }
 }

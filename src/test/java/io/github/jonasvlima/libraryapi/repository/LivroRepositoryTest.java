@@ -29,13 +29,13 @@ class LivroRepositoryTest {
         livro.setPreco(BigDecimal.valueOf(100));
         livro.setGenero(GeneroLivro.CIENCIA);
         livro.setTitulo("Teoria Das Cordas");
-        livro.setDataPublicacao(LocalDate.of(1969, 5, 15));
+        livro.setDataPublicacao(LocalDate.of(1990, 5, 15));
 
         Autor autor = autorRepository
-                .findById(UUID.fromString("5fe5b281-ff05-4b03-bbb5-a5f3c20559e0"))
+                .findById(UUID.fromString("a21b0297-db2a-477d-ae82-817d3c827ff7"))
                 .orElse(null);
 
-//        livro.setAutor(autor);
+        livro.setAutor(autor);
 
         repository.save(livro);
     }
