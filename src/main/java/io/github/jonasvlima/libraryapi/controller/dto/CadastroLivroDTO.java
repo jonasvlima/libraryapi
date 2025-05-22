@@ -24,4 +24,5 @@ public record CadastroLivroDTO(
         @NotNull(message = "campo obrigatório")
         UUID idAutor
         ) {
+
 }
