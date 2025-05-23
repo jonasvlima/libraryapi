@@ -3,7 +3,6 @@ package io.github.jonasvlima.libraryapi.service;
 import io.github.jonasvlima.libraryapi.model.GeneroLivro;
 import io.github.jonasvlima.libraryapi.model.Livro;
 import io.github.jonasvlima.libraryapi.repository.LivroRepository;
-import io.github.jonasvlima.libraryapi.repository.specs.LivroSpecs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -53,6 +52,10 @@ public class LivroService {
 
         if (genero != null){
             specs = specs.and(generoEqual(genero));
+        }
+
+        if (anoPublicacao != null) {
+            specs = specs.and(anoPublicacaoEqual(anoPublicacao));
         }
 
         return livroRepository.findAll(specs);
