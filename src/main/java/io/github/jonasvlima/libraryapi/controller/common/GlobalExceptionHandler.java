@@ -2,6 +2,7 @@ package io.github.jonasvlima.libraryapi.controller.common;
 
 import io.github.jonasvlima.libraryapi.controller.dto.ErroCampo;
 import io.github.jonasvlima.libraryapi.controller.dto.ErroResposta;
+import io.github.jonasvlima.libraryapi.exceptions.CampoInvalidoException;
 import io.github.jonasvlima.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.jonasvlima.libraryapi.exceptions.RegistroDuplicadoException;
 import org.springframework.http.HttpStatus;
@@ -43,9 +44,18 @@ public class GlobalExceptionHandler {
         return ErroResposta.respostaPadrao(e.getMessage());
     }
 
+    @ExceptionHandler(CampoInvalidoException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ErroResposta handleCampoInvalidoException(CampoInvalidoException e){
+        return new ErroResposta(HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                "Erro validação.",
+                List.of(new ErroCampo(e.getCampo(), e.getMessage())));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErroResposta handleErrosNaoTratados(RuntimeException e) {
+        System.out.println(e.getMessage());
         return new ErroResposta(HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Ocorreu um erro inesperado. Entre em contato com a administração", List.of());
     }
