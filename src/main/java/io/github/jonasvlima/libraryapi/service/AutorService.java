@@ -2,8 +2,10 @@ package io.github.jonasvlima.libraryapi.service;
 
 import io.github.jonasvlima.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.jonasvlima.libraryapi.model.Autor;
+import io.github.jonasvlima.libraryapi.model.Usuario;
 import io.github.jonasvlima.libraryapi.repository.AutorRepository;
 import io.github.jonasvlima.libraryapi.repository.LivroRepository;
+import io.github.jonasvlima.libraryapi.security.SecurityService;
 import io.github.jonasvlima.libraryapi.validator.AutorValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
@@ -19,12 +21,15 @@ import java.util.UUID;
 public class AutorService {
 
     private final AutorRepository autorRepository;
-    private final AutorValidator autorValidator;
+    private final AutorValidator validator;
     private final LivroRepository livroRepository;
+    private final SecurityService securityService;
 
 
     public Autor salvar(Autor autor){
-        autorValidator.validar(autor);
+        validator.validar(autor);
+        Usuario usuario = securityService.obterUsuarioLogado();
+        autor.setUsuario(usuario);
         return autorRepository.save(autor);
     }
 
@@ -32,7 +37,7 @@ public class AutorService {
         if (autor.getId() == null){
             throw new IllegalArgumentException("Para atualizar é necessário que o autor já esteja salvo na base");
         }
-        autorValidator.validar(autor);
+        validator.validar(autor);
         autorRepository.save(autor);
     }
 
